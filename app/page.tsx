@@ -117,13 +117,13 @@ export default function HomePage() {
           </nav>
           <div className="flex items-center gap-3">
             <Link
-              href="/login"
+              href="/auth/signin"
               className="text-sm text-muted-foreground hover:text-foreground"
             >
               Log in
             </Link>
             <Link
-              href="/signup"
+              href="/auth/signin"
               className="rounded-full bg-foreground px-4 py-2 text-sm font-medium text-background transition-colors hover:bg-foreground/90"
             >
               Start Free
@@ -147,7 +147,7 @@ export default function HomePage() {
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
-              href="/signup"
+              href="/auth/signin"
               className="rounded-full bg-foreground px-8 py-3 text-base font-medium text-background transition-colors hover:bg-foreground/90"
             >
               Start Free — No Credit Card
@@ -259,7 +259,7 @@ export default function HomePage() {
                   ))}
                 </ul>
                 <Link
-                  href="/signup"
+                  href="/auth/signin"
                   className={`rounded-full py-2.5 px-6 text-sm font-medium text-center transition-colors ${
                     plan.highlight
                       ? 'bg-background text-foreground hover:bg-background/90'

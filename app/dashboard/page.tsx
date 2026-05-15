@@ -18,6 +18,7 @@ interface Alert {
   sentiment: string;
   detected_at: string;
   monitors?: { keyword: string };
+  sent_to_telegram?: boolean;
 }
 
 interface Monitor {
