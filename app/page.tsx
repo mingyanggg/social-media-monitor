@@ -2,15 +2,15 @@ import Link from 'next/link';
 
 const features = [
   {
-    title: 'Competitor Intelligence',
+    title: 'Twitter Competitor Intelligence',
     description:
-      'Track your competitors across Twitter/X, LinkedIn, Instagram, and YouTube. Get instant alerts when they post, pivot, or launch.',
+      'Track competitors on Twitter/X. Get Telegram alerts when they post, pivot, or launch — daily digest or instant.',
     icon: '🔍',
   },
   {
     title: 'Brand Mention Detection',
     description:
-      'Never miss a conversation about your brand. Real-time monitoring across social platforms with sentiment analysis.',
+      'Never miss a conversation about your brand. Daily monitoring on Twitter with sentiment insights.',
     icon: '📣',
   },
   {
@@ -22,7 +22,7 @@ const features = [
   {
     title: 'Smart Alerts',
     description:
-      'Get notified via Telegram, Email, or Slack when keywords spike, competitors act, or opportunities emerge.',
+      'Get notified via Telegram when keywords spike, competitors act, or opportunities emerge. No missed signals.',
     icon: '⚡',
   },
 ];
@@ -39,15 +39,15 @@ const pricingPlans = [
   },
   {
     name: 'Pro',
-    price: '$19',
+    price: '$14',
     period: '/month',
-    description: 'For solopreneurs and small teams',
+    description: 'For solopreneurs ready to stay ahead',
     features: [
       '1,000 monitors/month',
       '5 competitors tracked',
-      'All platforms',
-      'Slack + Email + Telegram',
-      '90-day history',
+      'Twitter monitoring',
+      'Telegram alerts',
+      '7-day history',
       'AI trend detection',
     ],
     cta: 'Start Free Trial',
@@ -55,15 +55,15 @@ const pricingPlans = [
   },
   {
     name: 'Business',
-    price: '$49',
+    price: '$39',
     period: '/month',
     description: 'For growing agencies and teams',
     features: [
       'Unlimited monitors',
       'Unlimited competitors',
-      'All platforms',
+      'Twitter + priority features',
       'Priority support',
-      '1-year history',
+      '90-day history',
       'API access',
       'White-label reports',
     ],
@@ -75,11 +75,11 @@ const pricingPlans = [
 const faqs = [
   {
     q: 'Which social platforms do you monitor?',
-    a: 'We currently cover Twitter/X, LinkedIn, Instagram, YouTube, TikTok, and Reddit. More platforms are added monthly based on user demand.',
+    a: 'We currently focus on Twitter/X — the platform where competitors are most active and responsive. More platforms may be added based on user demand.',
   },
   {
     q: 'How accurate is the competitor tracking?',
-    a: 'We use official platform APIs where available, supplemented by curated third-party data sources. Competitor posts are typically detected within 5-15 minutes of publishing.',
+    a: 'We use the official Twitter API v2 to track keyword mentions and competitor posts. Detection runs on a scheduled basis — posts are typically picked up within hours of publishing, not minutes.',
   },
   {
     q: 'Can I monitor keywords without tracking competitors?',
@@ -136,7 +136,7 @@ export default function HomePage() {
       <section className="py-24 md:py-32">
         <div className="container mx-auto px-4 text-center">
           <div className="inline-block rounded-full bg-foreground/5 px-3 py-1 text-sm text-foreground/70 mb-6">
-            AI-Powered · Real-time · For Solopreneurs
+            AI-Powered · Twitter-First · For Solopreneurs
           </div>
           <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6 max-w-3xl mx-auto">
             Know What Your Competitors Do Before They Do It
