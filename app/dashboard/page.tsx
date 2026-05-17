@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { 
   Search, TrendingUp, TrendingDown, Bell, Users, 
@@ -8,6 +8,8 @@ import {
   BarChart3, Eye, Zap, Plus, RefreshCw, Settings
 } from 'lucide-react';
 import AddMonitorModal from './components/AddMonitorModal';
+
+const AUTO_POLL_INTERVAL = 5 * 60 * 1000; // 5 minutes
 
 interface Alert {
   id: string;
@@ -73,6 +75,10 @@ export default function DashboardPage() {
   const [showModal, setShowModal] = useState(false);
   const [error, setError] = useState('');
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [isAutoPolling, setIsAutoPolling] = useState(false);
+  const [nextPollIn, setNextPollIn] = useState(AUTO_POLL_INTERVAL / 1000);
+  const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const countdownRef = useRef<NodeJS.Timeout | null>(null);
 
   const fetchData = async () => {
     setIsLoading(true);
@@ -117,6 +123,40 @@ export default function DashboardPage() {
   useEffect(() => {
     fetchData();
   }, []);
+
+  // Auto-poll monitoring: run checks every 5 minutes when in live mode
+  useEffect(() => {
+    if (isDemoMode || monitors.length === 0) {
+      setIsAutoPolling(false);
+      return;
+    }
+
+    const startAutoPoll = () => {
+      setIsAutoPolling(true);
+      setNextPollIn(AUTO_POLL_INTERVAL / 1000);
+
+      // Countdown timer (update every second)
+      countdownRef.current = setInterval(() => {
+        setNextPollIn(prev => {
+          if (prev <= 1) return AUTO_POLL_INTERVAL / 1000;
+          return prev - 1;
+        });
+      }, 1000);
+
+      // Auto-run monitor check every 5 minutes
+      pollIntervalRef.current = setInterval(async () => {
+        setNextPollIn(AUTO_POLL_INTERVAL / 1000);
+        await handleRunMonitor();
+      }, AUTO_POLL_INTERVAL);
+    };
+
+    startAutoPoll();
+
+    return () => {
+      if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
+      if (countdownRef.current) clearInterval(countdownRef.current);
+    };
+  }, [isDemoMode, monitors.length]);
 
   const handleRunMonitor = async () => {
     try {
@@ -292,6 +332,12 @@ export default function DashboardPage() {
                   <span className="text-xs text-slate-500 flex items-center gap-1">
                     <Clock className="w-3 h-3" />
                     {formatTimeAgo(lastUpdated.toISOString())}
+                  </span>
+                )}
+                {isAutoPolling && (
+                  <span className="text-xs text-cyan-400 flex items-center gap-1" title={`Next check in ${nextPollIn}s`}>
+                    <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+                    Auto {nextPollIn}s
                   </span>
                 )}
                 <button 
