@@ -61,7 +61,7 @@ const pricingPlans = [
     features: [
       'Unlimited monitors',
       'Unlimited competitors',
-      'Twitter + priority features',
+      'Twitter monitoring',
       'Priority support',
       '90-day history',
       'API access',
@@ -75,7 +75,7 @@ const pricingPlans = [
 const faqs = [
   {
     q: 'Which social platforms do you monitor?',
-    a: 'We currently focus on Twitter/X — the platform where competitors are most active and responsive. More platforms may be added based on user demand.',
+    a: 'We focus exclusively on Twitter/X — the platform where competitors are most active and responsive.',
   },
   {
     q: 'How accurate is the competitor tracking?',
@@ -142,8 +142,8 @@ export default function HomePage() {
             Know What Your Competitors Do Before They Do It
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-10">
-            SocialPulse monitors your competitors, tracks brand mentions, and surfaces trends
-            — so you can react faster and stay ahead. No team required.
+            Never miss what matters on Twitter/X. SocialPulse tracks your competitors, brand mentions,
+            and emerging trends — so you can react faster and stay ahead. No team required.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
