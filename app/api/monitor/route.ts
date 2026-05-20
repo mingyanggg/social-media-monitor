@@ -89,11 +89,13 @@ export async function POST(request: NextRequest) {
         results.newAlerts++;
 
         // Send Telegram notification
+        const tweetUrl = `https://twitter.com/${tweet.authorUsername}/status/${tweet.id}`;
         const sent = await sendTelegramAlert({
           keyword: monitor.keyword,
           tweetText: tweet.text.substring(0, 200),
           author: tweet.authorUsername,
           engagement: tweet.engagement,
+          tweetUrl,
         });
 
         // Update alert with telegram status
