@@ -23,6 +23,39 @@ export async function GET() {
   return NextResponse.json({ monitors: data || [] });
 }
 
+export async function PATCH(request: NextRequest) {
+  const body = await request.json();
+  const { id, is_active } = body;
+
+  if (!id || typeof is_active !== 'boolean') {
+    return NextResponse.json(
+      { error: 'id and is_active are required' },
+      { status: 400 }
+    );
+  }
+
+  if (!isSupabaseConfigured()) {
+    return NextResponse.json(
+      { error: 'Supabase not configured' },
+      { status: 500 }
+    );
+  }
+
+  const { data, error } = await supabase!
+    .from('monitors')
+    .update({ is_active })
+    .eq('id', id)
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error updating monitor:', error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  return NextResponse.json({ monitor: data });
+}
+
 export async function POST(request: NextRequest) {
   const body = await request.json();
   const { keyword, platform = 'twitter' } = body;
