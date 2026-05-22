@@ -1,27 +1,40 @@
 'use client';
 
-import { signIn, useSession } from 'next-auth/react';
+import { useState } from 'react';
+import { signIn } from 'next-auth/react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
-import { Eye } from 'lucide-react';
+import { Eye, AlertCircle } from 'lucide-react';
 
 export default function SignInPage() {
-  const { data: session, status } = useSession();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [form, setForm] = useState({ email: '', password: '' });
   const router = useRouter();
 
-  useEffect(() => {
-    if (session) {
-      router.push('/dashboard');
-    }
-  }, [session, router]);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError('');
 
-  if (status === 'loading') {
-    return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
-        <div className="w-8 h-8 rounded-full border-2 border-cyan-500 border-t-transparent animate-spin" />
-      </div>
-    );
-  }
+    const result = await signIn('credentials', {
+      email: form.email,
+      password: form.password,
+      redirect: false,
+    });
+
+    if (result?.error) {
+      setError('Invalid email or password');
+      setIsLoading(false);
+      return;
+    }
+
+    router.push('/dashboard');
+  };
+
+  const handleTelegramSignIn = () => {
+    signIn('telegram', { callbackUrl: '/dashboard' });
+  };
 
   return (
     <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
@@ -34,11 +47,59 @@ export default function SignInPage() {
           <p className="text-slate-400">AI-powered social media monitoring</p>
         </div>
 
-        <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-8 space-y-4">
-          <h2 className="text-lg font-semibold text-white text-center mb-6">Sign in to continue</h2>
+        <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-8 space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-sm text-slate-400 mb-1.5">Email</label>
+              <input
+                type="email"
+                value={form.email}
+                onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
+                placeholder="you@example.com"
+                required
+                className="w-full px-4 py-3 rounded-xl bg-slate-800 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-cyan-500/50 transition"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm text-slate-400 mb-1.5">Password</label>
+              <input
+                type="password"
+                value={form.password}
+                onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
+                placeholder="Your password"
+                required
+                className="w-full px-4 py-3 rounded-xl bg-slate-800 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-cyan-500/50 transition"
+              />
+            </div>
+
+            {error && (
+              <div className="flex items-center gap-2 text-red-400 text-sm">
+                <AlertCircle className="w-4 h-4" />
+                {error}
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full py-3 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-semibold transition disabled:opacity-50"
+            >
+              {isLoading ? 'Signing in...' : 'Sign in'}
+            </button>
+          </form>
+
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-slate-800" />
+            </div>
+            <div className="relative flex justify-center text-xs">
+              <span className="px-2 bg-slate-900 text-slate-500">or continue with</span>
+            </div>
+          </div>
 
           <button
-            onClick={() => signIn('telegram', { callbackUrl: '/dashboard' })}
+            onClick={handleTelegramSignIn}
             className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white font-medium transition"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
@@ -47,17 +108,11 @@ export default function SignInPage() {
             Continue with Telegram
           </button>
 
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-slate-800" />
-            </div>
-            <div className="relative flex justify-center text-xs">
-              <span className="px-2 bg-slate-900 text-slate-500">More sign-in options coming soon</span>
-            </div>
-          </div>
-
           <p className="text-xs text-slate-500 text-center">
-            By signing in, you agree to our Terms of Service and Privacy Policy.
+            Don&apos;t have an account?{' '}
+            <Link href="/auth/signup" className="text-cyan-400 hover:text-cyan-300">
+              Sign up
+            </Link>
           </p>
         </div>
       </div>
