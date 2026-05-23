@@ -8,7 +8,7 @@ import {
   ExternalLink, CheckCircle2, XCircle, AlertTriangle,
   TrendingUp, Eye, MessageCircle, RefreshCw,
   BarChart3, Clock, ToggleLeft, ToggleRight,
-  LogOut, ChevronRight
+  LogOut, ChevronRight, Trash2
 } from 'lucide-react';
 
 interface Monitor {
@@ -37,6 +37,8 @@ export default function AccountPage() {
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [togglingId, setTogglingId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
 
   const isTelegramConfigured = !!(
     process.env.NEXT_PUBLIC_TELEGRAM_BOT_TOKEN && 
@@ -96,6 +98,21 @@ export default function AccountPage() {
       console.error('Error toggling monitor:', err);
     } finally {
       setTogglingId(null);
+    }
+  };
+
+  const handleDeleteMonitor = async (id: string) => {
+    setDeletingId(id);
+    try {
+      const res = await fetch(`/api/monitors?id=${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        setMonitors(prev => prev.filter(m => m.id !== id));
+        setShowDeleteConfirm(null);
+      }
+    } catch (err) {
+      console.error('Error deleting monitor:', err);
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -325,6 +342,31 @@ export default function AccountPage() {
                       )}
                       {monitor.is_active ? 'Active' : 'Paused'}
                     </button>
+                    {showDeleteConfirm === monitor.id ? (
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => handleDeleteMonitor(monitor.id)}
+                          disabled={deletingId === monitor.id}
+                          className="px-3 py-1.5 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30 text-sm font-medium transition disabled:opacity-50"
+                        >
+                          {deletingId === monitor.id ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : 'Confirm'}
+                        </button>
+                        <button
+                          onClick={() => setShowDeleteConfirm(null)}
+                          className="px-3 py-1.5 rounded-lg bg-slate-800 text-slate-400 hover:bg-slate-700 text-sm font-medium transition"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => setShowDeleteConfirm(monitor.id)}
+                        className="p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition"
+                        title="Delete monitor"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    )}
                   </div>
                 </div>
               ))}

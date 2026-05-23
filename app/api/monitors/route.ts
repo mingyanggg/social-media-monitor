@@ -23,6 +23,37 @@ export async function GET() {
   return NextResponse.json({ monitors: data || [] });
 }
 
+export async function DELETE(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
+  const id = searchParams.get('id');
+
+  if (!id) {
+    return NextResponse.json(
+      { error: 'id query parameter is required' },
+      { status: 400 }
+    );
+  }
+
+  if (!isSupabaseConfigured()) {
+    return NextResponse.json(
+      { error: 'Supabase not configured' },
+      { status: 500 }
+    );
+  }
+
+  const { error } = await supabase!
+    .from('monitors')
+    .delete()
+    .eq('id', id);
+
+  if (error) {
+    console.error('Error deleting monitor:', error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  return NextResponse.json({ success: true });
+}
+
 export async function PATCH(request: NextRequest) {
   const body = await request.json();
   const { id, is_active } = body;
