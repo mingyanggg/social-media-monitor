@@ -123,7 +123,7 @@ export default function HomePage() {
               Log in
             </Link>
             <Link
-              href="/auth/signin"
+              href="/auth/signup"
               className="rounded-full bg-foreground px-4 py-2 text-sm font-medium text-background transition-colors hover:bg-foreground/90"
             >
               Start Free
@@ -147,7 +147,7 @@ export default function HomePage() {
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
-              href="/auth/signin"
+              href="/auth/signup"
               className="rounded-full bg-foreground px-8 py-3 text-base font-medium text-background transition-colors hover:bg-foreground/90"
             >
               Start Free — No Credit Card
@@ -259,7 +259,7 @@ export default function HomePage() {
                   ))}
                 </ul>
                 <Link
-                  href="/auth/signin"
+                  href="/auth/signup"
                   className={`rounded-full py-2.5 px-6 text-sm font-medium text-center transition-colors ${
                     plan.highlight
                       ? 'bg-background text-foreground hover:bg-background/90'
@@ -301,7 +301,7 @@ export default function HomePage() {
             Join thousands of solopreneurs who use SocialPulse to stay ahead of their competition.
           </p>
           <Link
-            href="/signup"
+            href="/auth/signup"
             className="inline-block rounded-full bg-background px-8 py-3 text-foreground font-medium transition-colors hover:bg-background/90"
           >
             Get Started Free

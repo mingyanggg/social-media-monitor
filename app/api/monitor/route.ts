@@ -2,8 +2,9 @@
 // Can be called by cron job or manually
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
-import { searchRecentTweets } from '@/app/api/twitter-search/route';
+import { searchRecentTweets } from '@/lib/twitter';
 import { sendTelegramAlert } from '@/lib/telegram';
+import { analyzeSentiment } from '@/lib/minimax';
 
 export async function POST(request: NextRequest) {
   if (!isSupabaseConfigured()) {
@@ -65,6 +66,10 @@ export async function POST(request: NextRequest) {
           continue;
         }
 
+        // Analyze sentiment with MiniMax LLM
+        const sentimentResult = await analyzeSentiment(tweet.text);
+        const sentiment = sentimentResult.sentiment;
+
         const { data: alert, error: alertError } = await supabase!
           .from('alerts')
           .insert({
@@ -73,7 +78,7 @@ export async function POST(request: NextRequest) {
             content: tweet.text,
             author: tweet.authorUsername,
             engagement: tweet.engagement,
-            sentiment: 'neutral',
+            sentiment,
             detected_at: new Date(tweet.createdAt).toISOString(),
             sent_to_telegram: false,
           })
@@ -89,11 +94,13 @@ export async function POST(request: NextRequest) {
         results.newAlerts++;
 
         // Send Telegram notification
+        const tweetUrl = `https://twitter.com/${tweet.authorUsername}/status/${tweet.id}`;
         const sent = await sendTelegramAlert({
           keyword: monitor.keyword,
           tweetText: tweet.text.substring(0, 200),
           author: tweet.authorUsername,
           engagement: tweet.engagement,
+          tweetUrl,
         });
 
         // Update alert with telegram status

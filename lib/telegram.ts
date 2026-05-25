@@ -10,6 +10,7 @@ export interface TelegramAlert {
   author: string;
   engagement: number;
   platform?: string;
+  tweetUrl?: string;
 }
 
 export async function sendTelegramAlert(alert: TelegramAlert): Promise<boolean> {
@@ -23,7 +24,8 @@ export async function sendTelegramAlert(alert: TelegramAlert): Promise<boolean> 
 📌 Keyword: ${alert.keyword}
 💬 ${alert.tweetText}
 👤 @${alert.author}
-📊 ${alert.engagement.toLocaleString()} engagements`;
+📊 ${alert.engagement.toLocaleString()} engagements${alert.tweetUrl ? `
+🔗 ${alert.tweetUrl}` : ''}`;
 
   try {
     const response = await fetch(

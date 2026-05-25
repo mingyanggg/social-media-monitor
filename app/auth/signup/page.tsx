@@ -4,12 +4,13 @@ import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Eye, AlertCircle } from 'lucide-react';
+import { Eye, AlertCircle, CheckCircle2 } from 'lucide-react';
 
-export default function SignInPage() {
+export default function SignUpPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  const [form, setForm] = useState({ email: '', password: '' });
+  const [success, setSuccess] = useState(false);
+  const [form, setForm] = useState({ name: '', email: '', password: '' });
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -17,24 +18,65 @@ export default function SignInPage() {
     setIsLoading(true);
     setError('');
 
-    const result = await signIn('credentials', {
-      email: form.email,
-      password: form.password,
-      redirect: false,
-    });
+    try {
+      // Create account
+      const res = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      });
 
-    if (result?.error) {
-      setError('Invalid email or password');
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || 'Failed to create account');
+        return;
+      }
+
+      setSuccess(true);
+
+      // Auto sign in
+      const result = await signIn('credentials', {
+        email: form.email,
+        password: form.password,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        setError('Account created but sign in failed. Please try signing in.');
+        return;
+      }
+
+      router.push('/dashboard');
+    } catch {
+      setError('Something went wrong. Please try again.');
+    } finally {
       setIsLoading(false);
-      return;
     }
-
-    router.push('/dashboard');
   };
 
   const handleTelegramSignIn = () => {
     signIn('telegram', { callbackUrl: '/dashboard' });
   };
+
+  if (success) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
+        <div className="w-full max-w-md text-center">
+          <div className="w-14 h-14 rounded-2xl bg-emerald-500/20 flex items-center justify-center mx-auto mb-4">
+            <CheckCircle2 className="w-7 h-7 text-emerald-400" />
+          </div>
+          <h2 className="text-xl font-bold text-white mb-2">Check your email!</h2>
+          <p className="text-slate-400 mb-6">
+            We&apos;ve sent a confirmation to <span className="text-white">{form.email}</span>
+          </p>
+          <Link href="/auth/signin" className="text-cyan-400 hover:text-cyan-300 text-sm">
+            Back to sign in
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
@@ -43,12 +85,23 @@ export default function SignInPage() {
           <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center mx-auto mb-4">
             <Eye className="w-7 h-7 text-white" />
           </div>
-          <h1 className="text-2xl font-bold text-white mb-2">SocialPulse</h1>
-          <p className="text-slate-400">AI-powered social media monitoring</p>
+          <h1 className="text-2xl font-bold text-white mb-2">Join SocialPulse</h1>
+          <p className="text-slate-400">Start monitoring your brand in 5 minutes</p>
         </div>
 
         <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-8 space-y-6">
           <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-sm text-slate-400 mb-1.5">Name</label>
+              <input
+                type="text"
+                value={form.name}
+                onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+                placeholder="Your name"
+                className="w-full px-4 py-3 rounded-xl bg-slate-800 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-cyan-500/50 transition"
+              />
+            </div>
+
             <div>
               <label className="block text-sm text-slate-400 mb-1.5">Email</label>
               <input
@@ -67,8 +120,9 @@ export default function SignInPage() {
                 type="password"
                 value={form.password}
                 onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
-                placeholder="Your password"
+                placeholder="Min 8 characters"
                 required
+                minLength={8}
                 className="w-full px-4 py-3 rounded-xl bg-slate-800 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-cyan-500/50 transition"
               />
             </div>
@@ -85,7 +139,7 @@ export default function SignInPage() {
               disabled={isLoading}
               className="w-full py-3 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-semibold transition disabled:opacity-50"
             >
-              {isLoading ? 'Signing in...' : 'Sign in'}
+              {isLoading ? 'Creating account...' : 'Create account'}
             </button>
           </form>
 
@@ -109,9 +163,9 @@ export default function SignInPage() {
           </button>
 
           <p className="text-xs text-slate-500 text-center">
-            Don&apos;t have an account?{' '}
-            <Link href="/auth/signup" className="text-cyan-400 hover:text-cyan-300">
-              Sign up
+            Already have an account?{' '}
+            <Link href="/auth/signin" className="text-cyan-400 hover:text-cyan-300">
+              Sign in
             </Link>
           </p>
         </div>

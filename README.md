@@ -1,23 +1,23 @@
-# Social Media Monitor (SocialPulse)
+# SocialPulse — Twitter Intelligence for Solopreneurs
 
-AI-powered social media monitoring SaaS for solopreneurs and small teams.
+Your daily competitor intelligence on Twitter/X. Set up in 3 minutes, get Telegram alerts, forget about it.
 
 **Live Demo**: [socialpulse.ai](https://socialpulse.ai)
 
 ## Features
 
-- **Competitor Intelligence** — Track competitors across Twitter/X, LinkedIn, Instagram, YouTube
-- **Brand Mention Detection** — Real-time monitoring with sentiment analysis
-- **Trend Discovery** — AI-powered trend detection based on velocity signals
-- **Smart Alerts** — Telegram, Email, and Slack notifications
+- **Competitor Tracking** — Monitor competitors on Twitter/X. Get Telegram alerts when they post, pivot, or launch.
+- **Brand Mention Detection** — Never miss a conversation about your brand. Daily monitoring with sentiment insights.
+- **Trend Discovery** — Surface emerging topics before they go viral. AI-powered trend detection based on velocity signals.
+- **Smart Alerts** — Telegram notifications when keywords spike or competitors act. No missed signals.
 
 ## Pricing
 
 | Plan | Price | Includes |
 |------|-------|----------|
-| Free | $0/mo | 60 monitors/month, 1 competitor |
-| Pro | $19/mo | 1,000 monitors, 5 competitors, all platforms |
-| Business | $49/mo | Unlimited, API access, white-label reports |
+| Free | $0/mo | 60 monitors/month, 1 competitor, Telegram alerts, 7-day history |
+| Pro | $14/mo | 1,000 monitors, 5 competitors, Twitter monitoring, Telegram alerts, 7-day history, AI trend detection |
+| Business | $39/mo | Unlimited monitors, unlimited competitors, Twitter monitoring, priority support, 90-day history, API access, white-label reports |
 
 ## Tech Stack
 
@@ -42,13 +42,13 @@ npm run dev
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
-OPENAI_API_KEY=your_openai_key
+OPENAI_API_KEY=***
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
 ## Project Status
 
-⚠️ **Early Stage** — Landing page live. Core monitoring features in development.
+⚠️ **Early Stage** — Landing page live. Twitter monitoring and Telegram alerts operational.
 
 ---
 

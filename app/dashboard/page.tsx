@@ -77,6 +77,16 @@ export default function DashboardPage() {
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [isAutoPolling, setIsAutoPolling] = useState(false);
   const [nextPollIn, setNextPollIn] = useState(AUTO_POLL_INTERVAL / 1000);
+
+  // Filtered alerts derived from search + platform filter
+  const filteredAlerts = alerts.filter(alert => {
+    const matchesSearch = searchInput.trim() === '' ||
+      alert.content.toLowerCase().includes(searchInput.toLowerCase()) ||
+      alert.author.toLowerCase().includes(searchInput.toLowerCase()) ||
+      (alert.monitors?.keyword || '').toLowerCase().includes(searchInput.toLowerCase());
+    const matchesPlatform = selectedPlatform === 'all' || alert.platform === selectedPlatform;
+    return matchesSearch && matchesPlatform;
+  });
   const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const countdownRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -86,7 +96,6 @@ export default function DashboardPage() {
     
     try {
       // Check if APIs are configured
-      const hasTwitterToken = process.env.NEXT_PUBLIC_TWITTER_BEARER_TOKEN || false;
       const hasSupabase = process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY;
       
       if (!hasSupabase) {
@@ -118,6 +127,11 @@ export default function DashboardPage() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Refresh monitors list after adding a new monitor
+  const handleMonitorAdded = () => {
+    fetchData();
   };
 
   useEffect(() => {
@@ -172,11 +186,11 @@ export default function DashboardPage() {
     }
   };
 
-  // Calculate stats from real data
+  // Calculate stats from filtered data
   const stats = [
     { 
       label: 'Mentions Today', 
-      value: alerts.length.toString(), 
+      value: filteredAlerts.length.toString(), 
       delta: lastUpdated ? `Updated ${formatTimeAgo(lastUpdated.toISOString())}` : 'No data', 
       up: true 
     },
@@ -188,13 +202,13 @@ export default function DashboardPage() {
     },
     { 
       label: 'Telegram Sent', 
-      value: alerts.filter(a => a.sent_to_telegram).length.toString(), 
+      value: filteredAlerts.filter(a => a.sent_to_telegram).length.toString(), 
       delta: 'notifications', 
       up: true 
     },
     { 
       label: 'New Alerts', 
-      value: alerts.filter(a => {
+      value: filteredAlerts.filter(a => {
         const diff = Date.now() - new Date(a.detected_at).getTime();
         return diff < 3600000; // Last hour
       }).length.toString(), 
@@ -301,6 +315,11 @@ export default function DashboardPage() {
               Add Monitor
             </button>
           </div>
+          <AddMonitorModal
+            isOpen={showModal}
+            onClose={() => setShowModal(false)}
+            onSuccess={handleMonitorAdded}
+          />
         </div>
 
         {/* Stats row */}
@@ -355,19 +374,21 @@ export default function DashboardPage() {
               <div className="rounded-xl bg-slate-900/80 border border-slate-800/60 p-8 flex items-center justify-center">
                 <RefreshCw className="w-6 h-6 text-cyan-400 animate-spin" />
               </div>
-            ) : alerts.length === 0 ? (
+            ) : filteredAlerts.length === 0 ? (
               <div className="rounded-xl bg-slate-900/80 border border-slate-800/60 p-8 text-center">
                 <Bell className="w-8 h-8 text-slate-600 mx-auto mb-3" />
-                <p className="text-slate-400 mb-1">No alerts yet</p>
+                <p className="text-slate-400 mb-1">{searchInput || selectedPlatform !== 'all' ? 'No matching alerts' : 'No alerts yet'}</p>
                 <p className="text-sm text-slate-500">
-                  {isDemoMode 
+                  {searchInput || selectedPlatform !== 'all' 
+                    ? 'Try different keywords or platform'
+                    : isDemoMode 
                     ? 'Add your API keys to start monitoring'
                     : 'Create a monitor and run a check to detect mentions'}
                 </p>
               </div>
             ) : (
               <div className="space-y-3">
-                {alerts.map(alert => (
+                {filteredAlerts.map(alert => (
                   <div key={alert.id} className="flex items-start gap-4 p-4 rounded-xl bg-slate-900/80 border border-slate-800/60 hover:border-slate-700/80 transition">
                     {/* Platform icon */}
                     <div className={`w-9 h-9 rounded-lg flex items-center justify-center text-xs font-bold flex-shrink-0 ${
